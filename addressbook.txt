@@ -1,0 +1,118 @@
+#!/bin/sh
+select=1
+a=6
+
+while [ "$select" -le "$a" ]
+do
+    echo -e "MENU\n\
+    1)Create address book\n\
+    2)view address book\n\
+    3)Insert record\n\
+    4)search a record\n\
+    5)delete record\n\
+    6)modify record\n\
+    7)Exit\n\
+    Enter your choice:\c"
+    read choice
+
+    create()
+    {
+        touch File1.txt
+        echo "Roll\tName\tPhoneNo\tAddress\n" >> File1.txt
+    }
+
+    insert()
+    {
+        echo "Roll no:\c"
+        read roll
+        echo "Name:\c"
+        read name
+        echo "Phone:\c"
+        while true
+        do
+            read phone
+            len=$(echo -n $phone | wc -m)
+            if [ $len -eq 10 ]; then
+                break;
+            else
+                echo "Enter a valid 10 digit number\n"
+            fi
+        done
+        echo "Address:\c"
+        read address
+        echo "$roll\t$name\t$phone\t$address" >> File1.txt
+    }
+
+    search()
+    {
+        echo "Enter phone number of record to search:\c"
+        read phon2
+        grep -q $phon2 File1.txt
+        if [ $? -ne 0 ]
+        then
+            echo "Record not found"
+        else
+            grep -i -w "$phon2" File1.txt
+            echo "Record found"
+        fi
+    }
+
+    delete()
+    {
+        echo "Enter phone number of record to delete"
+        read phon
+        grep -q -w $phon File1.txt
+        if [ $? -ne 0 ]
+        then
+            echo "Record not found"
+        else
+            grep -v -i -w "$phon" File1.txt > File2.txt
+            mv File2.txt File1.txt
+            echo "Record deleted"
+        fi
+    }
+
+    modify()
+    {
+        echo "Enter phone number of record to modify"
+        read phon2
+        grep -q -w $phon2 File1.txt
+        if [ $? -ne 0 ]
+        then
+            echo "Record not found"
+        else
+            grep -v -i -q -w "$phon2" File1.txt > a.txt
+            mv a.txt File1.txt
+            insert
+        fi
+    }
+
+    case "$choice" in
+
+        1) create ;;
+
+        2) cat File1.txt ;;
+
+        3)
+            x=1
+            y=1
+            while [ "$x" -eq "$y" ]
+            do
+                insert
+                echo "Do you want to keep adding more records\n Press 1 to continue\n Press 2 to discontinue"
+                read x
+            done
+        ;;
+
+        4) search ;;
+
+        5) delete ;;
+
+        6) modify ;;
+
+        7) echo "Exiting the program";;
+
+        *) echo "Enter valid input";;
+
+    esac
+done
